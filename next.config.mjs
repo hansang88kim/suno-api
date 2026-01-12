@@ -1,16 +1,24 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  webpack: (config) => {
-    config.module.rules.push({
+  reactStrictMode: true,
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      config.externals = config.externals || [];
+      // Add a list of libraries to exclude from bundling
+      config.externals.push('rebrowser-playwright-core');
+      config.externals.push('@playwright/browser-chromium');
+      config.externals.push('canvas'); // Preventing canvas errors that may occur
+    }
+      config.module.rules.push({
       test: /\.(ttf|html)$/i,
       type: 'asset/resource'
     });
+
     return config;
   },
   experimental: {
-    serverComponentsExternalPackages: ['@sparticuz/chromium'],
-    serverMinification: false // the server minification unfortunately breaks the selector class names
-  }
-};
+    serverMinification: false, // the server minification unfortunately breaks the selector class names
+  },
+};  
 
 export default nextConfig;
